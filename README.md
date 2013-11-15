@@ -4,18 +4,18 @@ DigestE-jmeter
 Extension for Jmeter support Autentification Digest with SHA.
 
 Inputs:
-=======
+-------
 username - Readable username
 password - Readable Password.
 
 Description:
-============
+------------
 - Encode the pssword Digest SHA
 - Create Http Header with username:realm:encodedPassword
  
 
 Protocol:
-=========
+---------
 <pre>This authentification is a challange.</pre>
 ```
 Client  Server
