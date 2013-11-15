@@ -18,7 +18,7 @@ Protocol:
 =========
 This authentification is a challange.
 <code>
-Client  Server
+Client  Server<br>
    |      |
    |----->| POST
    |<-----| 401 Unauthorized WWW-Auth Header with key for Challange
