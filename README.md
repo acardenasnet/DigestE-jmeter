@@ -18,10 +18,10 @@ Protocol:
 =========
 This authentification is a challange.
 <pre><br>
-Client  Server<br>
-   |      |<br>
-   |----->| POST<br>
-   |<-----| 401 Unauthorized WWW-Auth Header with key for Challange<br>
-   |----->| POST Autentification Header with response encoded<br>
-   |<-----| 200 OK<br>
+Client  Server
+   |      |
+   |----->| POST
+   |<-----| 401 Unauthorized WWW-Auth Header with key for Challange
+   |----->| POST Autentification Header with response encoded
+   |<-----| 200 OK
 </pre>
