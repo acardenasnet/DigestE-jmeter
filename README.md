@@ -17,11 +17,11 @@ Description:
 Protocol:
 =========
 This authentification is a challange.
-<code><br>
+<pre><br>
 Client  Server<br>
    |      |<br>
    |----->| POST<br>
    |<-----| 401 Unauthorized WWW-Auth Header with key for Challange<br>
    |----->| POST Autentification Header with response encoded<br>
    |<-----| 200 OK<br>
-</code>
+</pre>
