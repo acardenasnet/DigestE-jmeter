@@ -4,3 +4,10 @@
 *.jar
 *.war
 *.ear
+
+# Compiled source #
+###################
+*.classpath
+*.project
+*.settings
+target
