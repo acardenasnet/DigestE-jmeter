@@ -16,12 +16,12 @@ Description:
 
 Protocol:
 =========
-This authentification is a challange.
-<pre><br>
+<pre>This authentification is a challange.</pre>
+```
 Client  Server
    |      |
    |----->| POST
    |<-----| 401 Unauthorized WWW-Auth Header with key for Challange
    |----->| POST Autentification Header with response encoded
    |<-----| 200 OK
-</pre>
+```
