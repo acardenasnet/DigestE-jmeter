@@ -12,7 +12,6 @@ import org.apache.http.HttpRequest;
 import org.apache.http.auth.AUTH;
 import org.apache.http.auth.AuthenticationException;
 import org.apache.http.auth.Credentials;
-import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.impl.auth.DigestScheme;
 import org.apache.http.message.BasicHeaderValueFormatter;
 import org.apache.http.message.BasicNameValuePair;
@@ -76,22 +75,20 @@ public class DigestESchema extends DigestScheme
         String algorithm = getParameter("algorithm");
         String uname = credentials.getUserPrincipal().getName();
         String myPassword = credentials.getPassword();
-        UsernamePasswordCredentials myCredentials = null;
+
+        System.out.println(uri);
+        System.out.println(method);
 
         String myResponseHeader = null;
         String myAuthorizationHeader = null;
         try
         {
             myPassword = encryptPwd(myPassword);
-            System.out.println(myPassword);
-            System.out.println(credentials.getUserPrincipal().getName());
             String ha1 = encryptPwd(credentials.getUserPrincipal().getName()
                     + ":" + realm + ":" + myPassword);
             System.out.println(ha1);
             myResponseHeader = encryptPwd(ha1 + ":" + nonce);
             System.out.println("Response Header = " + myResponseHeader);
-            myCredentials = new UsernamePasswordCredentials(
-                    "alejandro.cardenas@ecofactor.com", myPassword);
 
             myAuthorizationHeader = "DigestE " + "username=" + "\""
                     + credentials.getUserPrincipal().getName() + "\", "
@@ -105,13 +102,11 @@ public class DigestESchema extends DigestScheme
         }
         catch (IOException e)
         {
-            e.printStackTrace(); // To change body of catch statement use File |
-                                 // Settings | File Templates.
+            e.printStackTrace();
         }
         catch (NoSuchAlgorithmException e)
         {
-            e.printStackTrace(); // To change body of catch statement use File |
-                                 // Settings | File Templates.
+            e.printStackTrace();
         }
 
         CharArrayBuffer buffer = new CharArrayBuffer(128);
@@ -123,7 +118,7 @@ public class DigestESchema extends DigestScheme
         {
             buffer.append(AUTH.WWW_AUTH_RESP);
         }
-        buffer.append(": Digest ");
+        buffer.append(": DigestE ");
 
         List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>(20);
         params.add(new BasicNameValuePair("username", uname));
@@ -135,6 +130,7 @@ public class DigestESchema extends DigestScheme
         {
             params.add(new BasicNameValuePair("algorithm", algorithm));
         }
+        
         if (opaque != null)
         {
             params.add(new BasicNameValuePair("opaque", opaque));
