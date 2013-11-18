@@ -29,7 +29,7 @@ public class DigestESchema extends DigestScheme
         return "digeste";
     }
 
-    private String encryptPwd(String aPassword) throws IOException,
+    private String hashEncode(String aPassword) throws IOException,
             NoSuchAlgorithmException
     {
         String password = aPassword;
@@ -40,7 +40,6 @@ public class DigestESchema extends DigestScheme
         byte[] unhashedBytes = pwsalt.toByteArray();
         byte[] digestVonPassword = md.digest(unhashedBytes);
         myReturn = convertToHexString(digestVonPassword);
-        System.out.println(myReturn);
         return myReturn;
     }
 
@@ -67,38 +66,20 @@ public class DigestESchema extends DigestScheme
     public Header authenticate(final Credentials credentials,
             final HttpRequest request) throws AuthenticationException
     {
-        String uri = getParameter("uri");
         String realm = getParameter("realm");
         String nonce = getParameter("nonce");
         String opaque = getParameter("opaque");
-        String method = getParameter("methodname");
         String algorithm = getParameter("algorithm");
         String uname = credentials.getUserPrincipal().getName();
         String myPassword = credentials.getPassword();
 
-        System.out.println(uri);
-        System.out.println(method);
-
         String myResponseHeader = null;
-        String myAuthorizationHeader = null;
         try
         {
-            myPassword = encryptPwd(myPassword);
-            String ha1 = encryptPwd(credentials.getUserPrincipal().getName()
+            myPassword = hashEncode(myPassword);
+            String ha1 = hashEncode(credentials.getUserPrincipal().getName()
                     + ":" + realm + ":" + myPassword);
-            System.out.println(ha1);
-            myResponseHeader = encryptPwd(ha1 + ":" + nonce);
-            System.out.println("Response Header = " + myResponseHeader);
-
-            myAuthorizationHeader = "DigestE " + "username=" + "\""
-                    + credentials.getUserPrincipal().getName() + "\", "
-                    + "realm=" + "\"" + realm + "\", " + "nonce=" + "\""
-                    + nonce + "\", " + "response=" + "\"" + myResponseHeader
-                    + "\", " + "opaque=" + "\"" + opaque + "\"";
-
-            System.out.println(" AuthorizationHeader = "
-                    + myAuthorizationHeader);
-
+            myResponseHeader = hashEncode(ha1 + ":" + nonce);
         }
         catch (IOException e)
         {

@@ -60,7 +60,6 @@ public class DigestESampler extends HTTPSampler
         httmlSamplerResult.setSampleLabel(getName());
         httmlSamplerResult.setDataEncoding("UTF-8");
         httmlSamplerResult.setDataType("text/xml");
-//        res.setSamplerData(getRequestBody());
         httmlSamplerResult.setMonitor(isMonitor());
         httmlSamplerResult.sampleStart();
         DefaultHttpClient httpclient = new DefaultHttpClient();
@@ -72,16 +71,12 @@ public class DigestESampler extends HTTPSampler
             String myUrlString = getUrl().toString();
             
             myUrlString = toValidUrl(myUrlString);
-            System.out.println("Requesting : " + myUrlString);
             HttpPost httpget = new HttpPost(
-//                    "http://localhost:8088/ws/v1.0/authenticate");
                     myUrlString);
-            System.out.println("Requesting : " + httpget.getURI());
             
             // Initial request without credentials returns
             // "HTTP/1.1 401 Unauthorized"
             HttpResponse response = httpclient.execute(httpget);
-            System.out.println(response.getStatusLine());
             httmlSamplerResult.setURL(getUrl());
 
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED)
@@ -92,31 +87,23 @@ public class DigestESampler extends HTTPSampler
                 // nonce="cdcf6cbe6ee17ae0790ed399935997e8",
                 // opaque="ae40d7c8ca6a35af15460d352be5e71c"
                 Header authHeader = response.getFirstHeader(AUTH.WWW_AUTH);
-                System.out.println("authHeader = " + authHeader);
-                log.info("Start : sample " + getUrl());
+                log.debug("Start : sample DigestESampler");
                 
-                log.info("method " + getMethod());
                 DigestScheme digestScheme = new DigestESchema();
 
                 // Parse realm, nonce sent by server.
                 digestScheme.processChallenge(authHeader);
 
-                System.out.println("before creds");
                 UsernamePasswordCredentials creds = new UsernamePasswordCredentials(
                         getPropertyAsString(USER_KEY),
                         getPropertyAsString(USER_SECRET));
-                System.out.println("Scheme autenticate");
                 httpget.addHeader(digestScheme.authenticate(creds, httpget));
-                System.out.println("Scheme autenticate out");
 
                 responseHandler = new BasicResponseHandler();
-                String responseBody = httpclient2.execute(httpget,
-                        responseHandler);
-                System.out.println("responseBody : " + responseBody);
+                httpclient2.execute(httpget, responseHandler);
             }
             else if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK)
             {
-                System.out.println("Normally Not found");
                 httmlSamplerResult.setResponseCode(Integer.toString(response.getStatusLine().getStatusCode()));
                 httmlSamplerResult.setSuccessful(isSuccessCode(response.getStatusLine().getStatusCode()));
                 httmlSamplerResult.setResponseMessage(response.getStatusLine().getReasonPhrase());
@@ -129,13 +116,11 @@ public class DigestESampler extends HTTPSampler
         httmlSamplerResult.setResponseCode(Integer.toString(200));
         httmlSamplerResult.setSuccessful(isSuccessCode(200));
 
-        // res.setResponseMessageOK();
-
-        String ct = "";
-        Header[] h = httpget.getAllHeaders();
-        for (Header myHeader : h)
+        String myHeaderRsponse = "";
+        Header[] myHeaders = httpget.getAllHeaders();
+        for (Header myHeader : myHeaders)
         {
-            ct += myHeader.getName() + "=" + myHeader.getValue() + ",";
+            myHeaderRsponse += myHeader.getName() + "=" + myHeader.getValue() + ",";
             org.apache.jmeter.protocol.http.control.Header myHeaderJmeter = new org.apache.jmeter.protocol.http.control.Header(
                     myHeader.getName(), myHeader.getValue());
 
@@ -158,9 +143,8 @@ public class DigestESampler extends HTTPSampler
             getCookieManager().add(myJmeterCookie);
         }
 
-        System.out.println(cookiesString);
         httmlSamplerResult.setCookies(cookiesString);
-        httmlSamplerResult.setResponseHeaders(ct);
+        httmlSamplerResult.setResponseHeaders(myHeaderRsponse);
         httmlSamplerResult.setContentType("application/json");
 
         log.debug("End : sample");
@@ -174,15 +158,15 @@ public class DigestESampler extends HTTPSampler
         {
             e.printStackTrace();
         }
+        catch (HttpResponseException e)
+        {
+            HttpResponseException myException = (HttpResponseException) e;
+            String myCode = String.valueOf(myException.getStatusCode());
+            httmlSamplerResult.setResponseCode(myCode);
+            httmlSamplerResult.setSuccessful(isSuccessCode(myException.getStatusCode()));
+        }
         catch (ClientProtocolException e)
         {
-            if (e instanceof HttpResponseException)
-            {
-                HttpResponseException myException = (HttpResponseException) e;
-                String myCode = String.valueOf(myException.getStatusCode());
-                httmlSamplerResult.setResponseCode(myCode);
-                httmlSamplerResult.setSuccessful(isSuccessCode(myException.getStatusCode()));
-            }
             e.printStackTrace(); 
         }
         catch (IOException e)
@@ -222,6 +206,4 @@ public class DigestESampler extends HTTPSampler
             return null;
         }
     }
-    
-
 }
