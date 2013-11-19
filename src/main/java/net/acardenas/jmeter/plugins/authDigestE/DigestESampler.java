@@ -84,12 +84,11 @@ public class DigestESampler extends HTTPSampler
             HttpPost myHttpPost = new HttpPost(
                     myUrlString);
 
-            setMethod(myHttpPost.getMethod());
-            
             // Initial request without credentials returns
             // "HTTP/1.1 401 Unauthorized"
             HttpResponse response = httpclient.execute(myHttpPost);
             httmlSamplerResult.setURL(getUrl());
+            httmlSamplerResult.setHTTPMethod(myHttpPost.getMethod());
 
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED)
             {
