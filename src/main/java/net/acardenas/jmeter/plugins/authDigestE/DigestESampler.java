@@ -81,12 +81,14 @@ public class DigestESampler extends HTTPSampler
             String myUrlString = getUrl().toString();
             
             myUrlString = toValidUrl(myUrlString);
-            HttpPost httpget = new HttpPost(
+            HttpPost myHttpPost = new HttpPost(
                     myUrlString);
+
+            setMethod(myHttpPost.getMethod());
             
             // Initial request without credentials returns
             // "HTTP/1.1 401 Unauthorized"
-            HttpResponse response = httpclient.execute(httpget);
+            HttpResponse response = httpclient.execute(myHttpPost);
             httmlSamplerResult.setURL(getUrl());
 
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED)
@@ -107,10 +109,10 @@ public class DigestESampler extends HTTPSampler
                 UsernamePasswordCredentials creds = new UsernamePasswordCredentials(
                         getPropertyAsString(USER_KEY),
                         getPropertyAsString(USER_SECRET));
-                httpget.addHeader(digestScheme.authenticate(creds, httpget));
+                myHttpPost.addHeader(digestScheme.authenticate(creds, myHttpPost));
 
                 responseHandler = new BasicResponseHandler();
-                httpclient2.execute(httpget, responseHandler);
+                httpclient2.execute(myHttpPost, responseHandler);
             }
             else if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK)
             {
@@ -127,7 +129,7 @@ public class DigestESampler extends HTTPSampler
         httmlSamplerResult.setSuccessful(isSuccessCode(200));
 
         String myHeaderRsponse = "";
-        Header[] myHeaders = httpget.getAllHeaders();
+        Header[] myHeaders = myHttpPost.getAllHeaders();
         for (Header myHeader : myHeaders)
         {
             myHeaderRsponse += myHeader.getName() + "=" + myHeader.getValue() + ",";
