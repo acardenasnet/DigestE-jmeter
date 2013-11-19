@@ -86,4 +86,30 @@ public class DigestESamplerGui extends AbstractSamplerGui
         resourceConfigPanel.add(oDigestEPanel);
         return resourceConfigPanel;
     }
+    
+    public void configure(TestElement el) 
+    {
+        super.configure(el);
+        DigestESampler sampler = (DigestESampler) el;
+        username.setText(sampler.getUserKey());
+        password.setText(sampler.getUserSecret());
+        server.setText(sampler.getDomain());
+        path.setText(sampler.getPath());
+    }
+    
+    /**
+     * Implements JMeterGUIComponent.clearGui
+     */
+    public void clearGui() {
+        super.clearGui();
+        clear();
+    }
+    
+    public void clear() {
+        this.username.setText("");
+        this.password.setText("");
+        this.server.setText("");
+        this.path.setText("");
+    }
+
 }

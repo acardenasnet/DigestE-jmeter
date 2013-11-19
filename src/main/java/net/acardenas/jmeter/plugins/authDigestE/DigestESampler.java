@@ -51,6 +51,16 @@ public class DigestESampler extends HTTPSampler
         setProperty(USER_SECRET, aUserSecret);
     }
     
+    public String getUserKey()
+    {
+        return getPropertyAsString(USER_KEY);
+    }
+    
+    public String getUserSecret()
+    {
+        return getPropertyAsString(USER_SECRET);
+    }
+    
     @Override
     public SampleResult sample()
     {
