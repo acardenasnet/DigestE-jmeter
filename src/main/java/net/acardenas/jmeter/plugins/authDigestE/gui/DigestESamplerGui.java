@@ -35,7 +35,8 @@ public class DigestESamplerGui extends AbstractSamplerGui
         return "DigestE_Sampler";
     }
 
-    public String getStaticLabel() {
+    public String getStaticLabel() 
+    {
         return "DigestE Sampler";
     }
 
@@ -51,7 +52,8 @@ public class DigestESamplerGui extends AbstractSamplerGui
     public void modifyTestElement(TestElement testElement)
     {
         super.configureTestElement(testElement);
-        if (testElement instanceof DigestESampler) {
+        if (testElement instanceof DigestESampler) 
+        {
             DigestESampler sampler = (DigestESampler) testElement;
             sampler.setUserKey(username.getText());
             sampler.setUserSecret(password.getText());
@@ -100,12 +102,14 @@ public class DigestESamplerGui extends AbstractSamplerGui
     /**
      * Implements JMeterGUIComponent.clearGui
      */
-    public void clearGui() {
+    public void clearGui() 
+    {
         super.clearGui();
         clear();
     }
     
-    public void clear() {
+    public void clear() 
+    {
         this.username.setText("");
         this.password.setText("");
         this.server.setText("");
