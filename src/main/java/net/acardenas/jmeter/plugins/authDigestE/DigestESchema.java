@@ -17,12 +17,16 @@ import org.apache.http.message.BasicHeaderValueFormatter;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.message.BufferedHeader;
 import org.apache.http.util.CharArrayBuffer;
+import org.apache.jorphan.logging.LoggingManager;
+import org.apache.log.Logger;
 
 /**
  * User: acardenas
  */
 public class DigestESchema extends DigestScheme
 {
+    private static final Logger LOG = LoggingManager.getLoggerForClass();
+    
     @Override
     public String getSchemeName()
     {
@@ -53,9 +57,13 @@ public class DigestESchema extends DigestScheme
             do
             {
                 if ((0 <= halfbyte) && (halfbyte <= 9))
+                {
                     buf.append((char) ('0' + halfbyte));
+                }
                 else
+                {
                     buf.append((char) ('a' + (halfbyte - 10)));
+                }
                 halfbyte = data[i] & 0x0F;
             }
             while (two_halfs++ < 1);
@@ -83,11 +91,11 @@ public class DigestESchema extends DigestScheme
         }
         catch (IOException e)
         {
-            e.printStackTrace();
+            LOG.error(e.getMessage(), e);
         }
         catch (NoSuchAlgorithmException e)
         {
-            e.printStackTrace();
+        	LOG.error(e.getMessage(), e);
         }
 
         CharArrayBuffer buffer = new CharArrayBuffer(128);
@@ -131,5 +139,4 @@ public class DigestESchema extends DigestScheme
         }
         return new BufferedHeader(buffer);
     }
-
 }

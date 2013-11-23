@@ -163,14 +163,15 @@ public class DigestESampler extends HTTPSampler
         }
         catch (MalformedChallengeException e)
         {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
         catch (AuthenticationException e)
         {
-            e.printStackTrace();
+        	log.error(e.getMessage(), e);
         }
         catch (HttpResponseException e)
         {
+        	log.warn(e.getMessage(), e);
             HttpResponseException myException = (HttpResponseException) e;
             String myCode = String.valueOf(myException.getStatusCode());
             httmlSamplerResult.setResponseCode(myCode);
@@ -178,12 +179,12 @@ public class DigestESampler extends HTTPSampler
         }
         catch (ClientProtocolException e)
         {
-            e.printStackTrace(); 
+        	log.error(e.getMessage(), e);
         }
         catch (IOException e)
         {
 
-            e.printStackTrace();
+        	log.error(e.getMessage(), e);
         }
         finally
         {
@@ -214,6 +215,7 @@ public class DigestESampler extends HTTPSampler
         }
         catch (MalformedURLException e)
         {
+        	log.error(e.getMessage(), e);
             return null;
         }
     }
