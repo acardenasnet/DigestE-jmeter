@@ -23,7 +23,7 @@ import org.apache.log.Logger;
 /**
  * User: acardenas
  */
-public class DigestESchema extends DigestScheme
+public class DigesteSchema extends DigestScheme
 {
     private static final Logger LOG = LoggingManager.getLoggerForClass();
     
@@ -49,11 +49,11 @@ public class DigestESchema extends DigestScheme
 
     private static String convertToHexString(byte[] data)
     {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         for (int i = 0; i < data.length; i++)
         {
             int halfbyte = (data[i] >>> 4) & 0x0F;
-            int two_halfs = 0;
+            int myTwoHalfs = 0;
             do
             {
                 if ((0 <= halfbyte) && (halfbyte <= 9))
@@ -66,7 +66,7 @@ public class DigestESchema extends DigestScheme
                 }
                 halfbyte = data[i] & 0x0F;
             }
-            while (two_halfs++ < 1);
+            while (myTwoHalfs++ < 1);
         }
         return buf.toString();
     }

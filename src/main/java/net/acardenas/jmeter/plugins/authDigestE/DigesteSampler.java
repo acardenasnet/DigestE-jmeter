@@ -30,12 +30,12 @@ import org.apache.log.Logger;
 /**
  * User: acardenas
  */
-public class DigestESampler extends HTTPSampler
+public class DigesteSampler extends HTTPSampler
 {
 
     private static final long serialVersionUID = 3302785804254990944L;
 
-    private static final Logger log = LoggingManager.getLoggerForClass();
+    private static final Logger LOG = LoggingManager.getLoggerForClass();
 
     public static final String USER_KEY = "DigestESampler.user_key";
     public static final String USER_SECRET = "DigestESampler.user_secret";
@@ -98,9 +98,9 @@ public class DigestESampler extends HTTPSampler
                 // nonce="cdcf6cbe6ee17ae0790ed399935997e8",
                 // opaque="ae40d7c8ca6a35af15460d352be5e71c"
                 Header authHeader = response.getFirstHeader(AUTH.WWW_AUTH);
-                log.debug("Start : sample DigestESampler");
+                LOG.debug("Start : sample DigestESampler");
                 
-                DigestScheme digestScheme = new DigestESchema();
+                DigestScheme digestScheme = new DigesteSchema();
 
                 // Parse realm, nonce sent by server.
                 digestScheme.processChallenge(authHeader);
@@ -158,20 +158,20 @@ public class DigestESampler extends HTTPSampler
         httmlSamplerResult.setResponseHeaders(myHeaderRsponse);
         httmlSamplerResult.setContentType("application/json");
 
-        log.debug("End : sample");
+        LOG.debug("End : sample");
 
         }
         catch (MalformedChallengeException e)
         {
-            log.error(e.getMessage(), e);
+            LOG.error(e.getMessage(), e);
         }
         catch (AuthenticationException e)
         {
-        	log.error(e.getMessage(), e);
+        	LOG.error(e.getMessage(), e);
         }
         catch (HttpResponseException e)
         {
-        	log.warn(e.getMessage(), e);
+        	LOG.warn(e.getMessage(), e);
             HttpResponseException myException = (HttpResponseException) e;
             String myCode = String.valueOf(myException.getStatusCode());
             httmlSamplerResult.setResponseCode(myCode);
@@ -179,12 +179,12 @@ public class DigestESampler extends HTTPSampler
         }
         catch (ClientProtocolException e)
         {
-        	log.error(e.getMessage(), e);
+        	LOG.error(e.getMessage(), e);
         }
         catch (IOException e)
         {
 
-        	log.error(e.getMessage(), e);
+        	LOG.error(e.getMessage(), e);
         }
         finally
         {
@@ -215,7 +215,7 @@ public class DigestESampler extends HTTPSampler
         }
         catch (MalformedURLException e)
         {
-        	log.error(e.getMessage(), e);
+        	LOG.error(e.getMessage(), e);
             return null;
         }
     }
