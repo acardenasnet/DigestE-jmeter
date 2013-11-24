@@ -1,4 +1,4 @@
-package net.acardenas.jmeter.plugins.authDigestE;
+package net.acardenas.jmeter.plugins.authDigeste;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
