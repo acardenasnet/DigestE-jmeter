@@ -85,7 +85,7 @@ public class DigesteSchema extends DigestScheme
         String nonce = getParameter(NONCE_PARAMETER_KEY);
         String opaque = getParameter(OPAQUE_PARAMETER_KEY);
         String algorithm = getParameter(ALGORITHM_PARAMETER_KEY);
-        String uname = credentials.getUserPrincipal().getName();
+        String myUsername = credentials.getUserPrincipal().getName();
         String myPassword = credentials.getPassword();
 
         String myResponseHeader = null;
@@ -117,7 +117,7 @@ public class DigesteSchema extends DigestScheme
         buffer.append(": DigestE ");
 
         List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>(20);
-        params.add(new BasicNameValuePair(USERNAME_PARAMETER_KEY, uname));
+        params.add(new BasicNameValuePair(USERNAME_PARAMETER_KEY, myUsername));
         params.add(new BasicNameValuePair(REALM_PARAMETER_KEY, realm));
         params.add(new BasicNameValuePair(NONCE_PARAMETER_KEY, nonce));
         params.add(new BasicNameValuePair(RESPONSE_PARAMETER_KEY, myResponseHeader));
