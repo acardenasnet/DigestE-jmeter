@@ -1,11 +1,11 @@
-package net.acardenas.jmeter.plugins.authDigestE.gui;
+package net.acardenas.jmeter.plugins.auth.digeste.gui;
 
 import java.awt.BorderLayout;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
-import net.acardenas.jmeter.plugins.authDigestE.DigestESampler;
+import net.acardenas.jmeter.plugins.auth.digeste.DigesteSampler;
 
 import org.apache.jmeter.gui.util.VerticalPanel;
 import org.apache.jmeter.samplers.gui.AbstractSamplerGui;
@@ -15,7 +15,7 @@ import org.apache.jorphan.gui.JLabeledTextField;
 /**
  * User: acardenas
  */
-public class DigestESamplerGui extends AbstractSamplerGui
+public class DigesteSamplerGui extends AbstractSamplerGui
 {
 
     private static final long serialVersionUID = -6044677237396079910L;
@@ -24,7 +24,7 @@ public class DigestESamplerGui extends AbstractSamplerGui
     private JLabeledTextField server;
     private JLabeledTextField path;
 
-    public DigestESamplerGui()
+    public DigesteSamplerGui()
     {
         init();
     }
@@ -43,7 +43,7 @@ public class DigestESamplerGui extends AbstractSamplerGui
     @Override
     public TestElement createTestElement()
     {
-        DigestESampler sampler = new DigestESampler();
+        DigesteSampler sampler = new DigesteSampler();
         modifyTestElement(sampler);
         return sampler;
     }
@@ -52,9 +52,9 @@ public class DigestESamplerGui extends AbstractSamplerGui
     public void modifyTestElement(TestElement testElement)
     {
         super.configureTestElement(testElement);
-        if (testElement instanceof DigestESampler) 
+        if (testElement instanceof DigesteSampler) 
         {
-            DigestESampler sampler = (DigestESampler) testElement;
+            DigesteSampler sampler = (DigesteSampler) testElement;
             sampler.setUserKey(username.getText());
             sampler.setUserSecret(password.getText());
             sampler.setDomain(server.getText());
@@ -73,7 +73,8 @@ public class DigestESamplerGui extends AbstractSamplerGui
         add(panel, BorderLayout.CENTER);
     }
 
-    private JPanel getResourceConfigPanel() {
+    private JPanel getResourceConfigPanel() 
+    {
         username = new JLabeledTextField("username", 40);
         password = new JLabeledTextField("password",40);
         server = new JLabeledTextField("Server Name or IP", 40);
@@ -92,7 +93,7 @@ public class DigestESamplerGui extends AbstractSamplerGui
     public void configure(TestElement el) 
     {
         super.configure(el);
-        DigestESampler sampler = (DigestESampler) el;
+        DigesteSampler sampler = (DigesteSampler) el;
         username.setText(sampler.getUserKey());
         password.setText(sampler.getUserSecret());
         server.setText(sampler.getDomain());
