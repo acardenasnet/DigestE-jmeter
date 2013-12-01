@@ -1,4 +1,4 @@
-package net.acardenas.jmeter.plugins.authDigeste;
+package net.acardenas.jmeter.plugins.auth.digeste;
 
 import java.io.IOException;
 import java.net.MalformedURLException;

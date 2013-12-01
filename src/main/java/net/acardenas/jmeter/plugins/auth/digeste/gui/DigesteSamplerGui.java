@@ -1,11 +1,11 @@
-package net.acardenas.jmeter.plugins.authDigeste.gui;
+package net.acardenas.jmeter.plugins.auth.digeste.gui;
 
 import java.awt.BorderLayout;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
-import net.acardenas.jmeter.plugins.authDigeste.DigesteSampler;
+import net.acardenas.jmeter.plugins.auth.digeste.DigesteSampler;
 
 import org.apache.jmeter.gui.util.VerticalPanel;
 import org.apache.jmeter.samplers.gui.AbstractSamplerGui;

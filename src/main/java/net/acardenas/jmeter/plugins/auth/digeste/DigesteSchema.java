@@ -1,4 +1,4 @@
-package net.acardenas.jmeter.plugins.authDigeste;
+package net.acardenas.jmeter.plugins.auth.digeste;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -7,6 +7,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.codec.digest.MessageDigestAlgorithms;
 import org.apache.http.Header;
 import org.apache.http.HttpRequest;
 import org.apache.http.auth.AUTH;
@@ -26,7 +27,14 @@ import org.apache.log.Logger;
 public class DigesteSchema extends DigestScheme
 {
     private static final Logger LOG = LoggingManager.getLoggerForClass();
-    
+
+    private static final String REALM_PARAMETER_KEY = "realm";
+    private static final String NONCE_PARAMETER_KEY = "nonce";
+    private static final String OPAQUE_PARAMETER_KEY = "opaque";
+    private static final String ALGORITHM_PARAMETER_KEY = "algorithm";
+    private static final String RESPONSE_PARAMETER_KEY = "response";
+    private static final String USERNAME_PARAMETER_KEY = "username";
+
     @Override
     public String getSchemeName()
     {
@@ -38,7 +46,7 @@ public class DigesteSchema extends DigestScheme
     {
         String password = aPassword;
         String myReturn = null;
-        final MessageDigest md = MessageDigest.getInstance("SHA1");
+        final MessageDigest md = MessageDigest.getInstance(MessageDigestAlgorithms.SHA_1);
         ByteArrayOutputStream pwsalt = new ByteArrayOutputStream();
         pwsalt.write(password.getBytes("UTF-8"));
         byte[] unhashedBytes = pwsalt.toByteArray();
@@ -59,14 +67,13 @@ public class DigesteSchema extends DigestScheme
                 if ((0 <= halfbyte) && (halfbyte <= 9))
                 {
                     buf.append((char) ('0' + halfbyte));
-                }
+                } 
                 else
                 {
                     buf.append((char) ('a' + (halfbyte - 10)));
                 }
                 halfbyte = data[i] & 0x0F;
-            }
-            while (myTwoHalfs++ < 1);
+            } while (myTwoHalfs++ < 1);
         }
         return buf.toString();
     }
@@ -74,10 +81,10 @@ public class DigesteSchema extends DigestScheme
     public Header authenticate(final Credentials credentials,
             final HttpRequest request) throws AuthenticationException
     {
-        String realm = getParameter("realm");
-        String nonce = getParameter("nonce");
-        String opaque = getParameter("opaque");
-        String algorithm = getParameter("algorithm");
+        String realm = getParameter(REALM_PARAMETER_KEY);
+        String nonce = getParameter(NONCE_PARAMETER_KEY);
+        String opaque = getParameter(OPAQUE_PARAMETER_KEY);
+        String algorithm = getParameter(ALGORITHM_PARAMETER_KEY);
         String uname = credentials.getUserPrincipal().getName();
         String myPassword = credentials.getPassword();
 
@@ -88,21 +95,21 @@ public class DigesteSchema extends DigestScheme
             String ha1 = hashEncode(credentials.getUserPrincipal().getName()
                     + ":" + realm + ":" + myPassword);
             myResponseHeader = hashEncode(ha1 + ":" + nonce);
-        }
+        } 
         catch (IOException e)
         {
             LOG.error(e.getMessage(), e);
-        }
+        } 
         catch (NoSuchAlgorithmException e)
         {
-        	LOG.error(e.getMessage(), e);
+            LOG.error(e.getMessage(), e);
         }
 
         CharArrayBuffer buffer = new CharArrayBuffer(128);
         if (isProxy())
         {
             buffer.append(AUTH.PROXY_AUTH_RESP);
-        }
+        } 
         else
         {
             buffer.append(AUTH.WWW_AUTH_RESP);
@@ -110,19 +117,19 @@ public class DigesteSchema extends DigestScheme
         buffer.append(": DigestE ");
 
         List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>(20);
-        params.add(new BasicNameValuePair("username", uname));
-        params.add(new BasicNameValuePair("realm", realm));
-        params.add(new BasicNameValuePair("nonce", nonce));
-        params.add(new BasicNameValuePair("response", myResponseHeader));
+        params.add(new BasicNameValuePair(USERNAME_PARAMETER_KEY, uname));
+        params.add(new BasicNameValuePair(REALM_PARAMETER_KEY, realm));
+        params.add(new BasicNameValuePair(NONCE_PARAMETER_KEY, nonce));
+        params.add(new BasicNameValuePair(RESPONSE_PARAMETER_KEY, myResponseHeader));
 
         if (algorithm != null)
         {
-            params.add(new BasicNameValuePair("algorithm", algorithm));
+            params.add(new BasicNameValuePair(ALGORITHM_PARAMETER_KEY, algorithm));
         }
-        
+
         if (opaque != null)
         {
-            params.add(new BasicNameValuePair("opaque", opaque));
+            params.add(new BasicNameValuePair(OPAQUE_PARAMETER_KEY, opaque));
         }
 
         for (int i = 0; i < params.size(); i++)
