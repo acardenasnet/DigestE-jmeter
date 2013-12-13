@@ -21,6 +21,7 @@ import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.auth.DigestScheme;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.protocol.HTTP;
 import org.apache.jmeter.protocol.http.sampler.HTTPSampleResult;
 import org.apache.jmeter.protocol.http.sampler.HTTPSampler;
 import org.apache.jmeter.samplers.SampleResult;
@@ -63,14 +64,14 @@ public class DigesteSampler extends HTTPSampler
     @Override
     public SampleResult sample()
     {
-        HTTPSampleResult httmlSamplerResult = new HTTPSampleResult();
-        httmlSamplerResult.setSuccessful(false);
-        httmlSamplerResult.setResponseCode("000");
-        httmlSamplerResult.setSampleLabel(getName());
-        httmlSamplerResult.setDataEncoding("UTF-8");
-        httmlSamplerResult.setDataType("text/xml");
-        httmlSamplerResult.setMonitor(isMonitor());
-        httmlSamplerResult.sampleStart();
+        HTTPSampleResult httpSamplerResult = new HTTPSampleResult();
+        httpSamplerResult.setSuccessful(false);
+        httpSamplerResult.setResponseCode("000");
+        httpSamplerResult.setSampleLabel(getName());
+        httpSamplerResult.setDataEncoding("UTF-8");
+        httpSamplerResult.setDataType("text/xml");
+        httpSamplerResult.setMonitor(isMonitor());
+        httpSamplerResult.sampleStart();
         DefaultHttpClient httpclient = new DefaultHttpClient();
         DefaultHttpClient httpclient2 = new DefaultHttpClient();
 
@@ -80,21 +81,31 @@ public class DigesteSampler extends HTTPSampler
             String myUrlString = getUrl().toString();
 
             myUrlString = toValidUrl(myUrlString);
-            HttpPost myHttpPost = new HttpPost(myUrlString);
+            LOG.debug(myUrlString);
+            HTTPSampleResult myHttpSampleResult = sample(getUrl(), POST, false, 0);
+            //HttpPost myHttpPost = new HttpPost(myUrlString);
+            HttpPost myHttpPost = null;
 
             // Initial request without credentials returns
             // "HTTP/1.1 401 Unauthorized"
-            HttpResponse response = httpclient.execute(myHttpPost);
-            httmlSamplerResult.setURL(getUrl());
-            httmlSamplerResult.setHTTPMethod(myHttpPost.getMethod());
-
-            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED)
+            //HttpResponse response = httpclient.execute(myHttpPost);
+            HttpResponse response = null;
+            //httmlSamplerResult.setURL(getUrl());
+            //httmlSamplerResult.setHTTPMethod(myHttpPost.getMethod());
+            LOG.debug(myHttpSampleResult.getResponseCode());
+            if (myHttpSampleResult.getResponseCode().equals("401"))
             {
 
                 // Get current current "WWW-Authenticate" header from response
                 // WWW-Authenticate:Digest realm="My Test Realm", qop="auth",
                 // nonce="cdcf6cbe6ee17ae0790ed399935997e8",
                 // opaque="ae40d7c8ca6a35af15460d352be5e71c"
+                String[] myHeaders = myHttpSampleResult.getResponseHeaders().split("\n");
+                for (String myHeader : myHeaders)
+                {
+                    LOG.debug(myHeader);
+                }
+
                 Header authHeader = response.getFirstHeader(AUTH.WWW_AUTH);
                 LOG.debug("Start : sample DigestESampler");
 
@@ -114,19 +125,19 @@ public class DigesteSampler extends HTTPSampler
             } 
             else if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK)
             {
-                httmlSamplerResult.setResponseCode(Integer.toString(response
+                httpSamplerResult.setResponseCode(Integer.toString(response
                         .getStatusLine().getStatusCode()));
-                httmlSamplerResult.setSuccessful(isSuccessCode(response
+                httpSamplerResult.setSuccessful(isSuccessCode(response
                         .getStatusLine().getStatusCode()));
-                httmlSamplerResult.setResponseMessage(response.getStatusLine()
+                httpSamplerResult.setResponseMessage(response.getStatusLine()
                         .getReasonPhrase());
-                return httmlSamplerResult;
+                return httpSamplerResult;
             }
 
-            httmlSamplerResult.sampleEnd();
+            httpSamplerResult.sampleEnd();
 
-            httmlSamplerResult.setResponseCode(Integer.toString(200));
-            httmlSamplerResult.setSuccessful(isSuccessCode(200));
+            httpSamplerResult.setResponseCode(Integer.toString(200));
+            httpSamplerResult.setSuccessful(isSuccessCode(200));
 
             String myHeaderRsponse = "";
             Header[] myHeaders = myHttpPost.getAllHeaders();
@@ -156,9 +167,9 @@ public class DigesteSampler extends HTTPSampler
                 getCookieManager().add(myJmeterCookie);
             }
 
-            httmlSamplerResult.setCookies(cookiesString);
-            httmlSamplerResult.setResponseHeaders(myHeaderRsponse);
-            httmlSamplerResult.setContentType("application/json");
+            httpSamplerResult.setCookies(cookiesString);
+            httpSamplerResult.setResponseHeaders(myHeaderRsponse);
+            httpSamplerResult.setContentType("application/json");
 
             LOG.debug("End : sample");
 
@@ -176,8 +187,8 @@ public class DigesteSampler extends HTTPSampler
             LOG.warn(e.getMessage(), e);
             HttpResponseException myException = (HttpResponseException) e;
             String myCode = String.valueOf(myException.getStatusCode());
-            httmlSamplerResult.setResponseCode(myCode);
-            httmlSamplerResult.setSuccessful(isSuccessCode(myException
+            httpSamplerResult.setResponseCode(myCode);
+            httpSamplerResult.setSuccessful(isSuccessCode(myException
                     .getStatusCode()));
         } 
         catch (ClientProtocolException e)
@@ -195,7 +206,7 @@ public class DigesteSampler extends HTTPSampler
             httpclient2.getConnectionManager().shutdown();
         }
 
-        return httmlSamplerResult;
+        return httpSamplerResult;
     }
 
     private String toValidUrl(String u) throws MalformedURLException

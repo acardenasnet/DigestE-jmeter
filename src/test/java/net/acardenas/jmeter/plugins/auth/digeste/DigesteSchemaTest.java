@@ -2,6 +2,7 @@ package net.acardenas.jmeter.plugins.auth.digeste;
 
 import static junit.framework.Assert.assertEquals;
 
+import org.apache.http.HeaderElement;
 import org.apache.http.HttpRequest;
 import org.apache.http.auth.AuthenticationException;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -40,7 +41,16 @@ public class DigesteSchemaTest
         UsernamePasswordCredentials myCredentials = new UsernamePasswordCredentials(
                 "Username",
                 "Secret");
-        digesteSchema.authenticate(myCredentials, httpRequest);
+        org.apache.http.Header myHeader = digesteSchema.authenticate(myCredentials, httpRequest);
+        System.out.println(myHeader.getName());
+        System.out.println(myHeader.getValue());
+
+        for (HeaderElement myHeaderElement : myHeader.getElements())
+        {
+            System.out.print(myHeaderElement.getName());
+            System.out.println(myHeaderElement.getValue());
+        }
+
         return;
     }
 
