@@ -78,8 +78,7 @@ public class DigesteSchema extends DigestScheme
         return buf.toString();
     }
 
-    public Header authenticate(final Credentials credentials,
-            final HttpRequest request) throws AuthenticationException
+    public Header authenticate(final Credentials credentials) throws AuthenticationException
     {
         String realm = getParameter(REALM_PARAMETER_KEY);
         String nonce = getParameter(NONCE_PARAMETER_KEY);

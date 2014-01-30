@@ -21,6 +21,7 @@ import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.auth.DigestScheme;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 import org.apache.jmeter.protocol.http.sampler.HTTPSampleResult;
 import org.apache.jmeter.protocol.http.sampler.HTTPSampler;
@@ -101,15 +102,22 @@ public class DigesteSampler extends HTTPSampler
                 // nonce="cdcf6cbe6ee17ae0790ed399935997e8",
                 // opaque="ae40d7c8ca6a35af15460d352be5e71c"
                 String[] myHeaders = myHttpSampleResult.getResponseHeaders().split("\n");
-                for (String myHeader : myHeaders)
+                Header myHeader = null;
+                for (String myHeaderString : myHeaders)
                 {
-                    LOG.debug(myHeader);
+                    LOG.debug(myHeaderString);
+                    if (myHeaderString.startsWith("Www-Authenticate"))
+                    {
+                        String[] myHeaderSplit = myHeaderString.split(":");
+                        myHeader = new BasicHeader(myHeaderSplit[0], myHeaderSplit[1]);
+
+                    }
                 }
 
-                Header authHeader = response.getFirstHeader(AUTH.WWW_AUTH);
+                Header authHeader = myHeader;
                 LOG.debug("Start : sample DigestESampler");
 
-                DigestScheme digestScheme = new DigesteSchema();
+                DigesteSchema digestScheme = new DigesteSchema();
 
                 // Parse realm, nonce sent by server.
                 digestScheme.processChallenge(authHeader);
@@ -117,12 +125,17 @@ public class DigesteSampler extends HTTPSampler
                 UsernamePasswordCredentials creds = new UsernamePasswordCredentials(
                         getPropertyAsString(USER_KEY),
                         getPropertyAsString(USER_SECRET));
-                myHttpPost.addHeader(digestScheme.authenticate(creds,
-                        myHttpPost));
+
+                myHeader = digestScheme.authenticate(creds );
+                LOG.debug(myHeader.getName());
+                LOG.debug(myHeader.getValue());
+
+                getHeaderManager().add(new org.apache.jmeter.protocol.http.control.Header(myHeader.getName(), myHeader.getValue()));
+//                myHttpPost.addHeader(digestScheme.authenticate(creds,
+//                        myHttpPost));
 
                 responseHandler = new BasicResponseHandler();
-                httpclient2.execute(myHttpPost, responseHandler);
-            } 
+            }
             else if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK)
             {
                 httpSamplerResult.setResponseCode(Integer.toString(response
@@ -133,77 +146,18 @@ public class DigesteSampler extends HTTPSampler
                         .getReasonPhrase());
                 return httpSamplerResult;
             }
+        }
+        catch (MalformedURLException e)
+        {
 
-            httpSamplerResult.sampleEnd();
-
-            httpSamplerResult.setResponseCode(Integer.toString(200));
-            httpSamplerResult.setSuccessful(isSuccessCode(200));
-
-            String myHeaderRsponse = "";
-            Header[] myHeaders = myHttpPost.getAllHeaders();
-            for (Header myHeader : myHeaders)
-            {
-                myHeaderRsponse += myHeader.getName() + "="
-                        + myHeader.getValue() + ",";
-                org.apache.jmeter.protocol.http.control.Header myHeaderJmeter = new org.apache.jmeter.protocol.http.control.Header(
-                        myHeader.getName(), myHeader.getValue());
-
-                getHeaderManager().add(myHeaderJmeter);
-            }
-
-            // get cookieStore
-            CookieStore cookieStore = httpclient2.getCookieStore();
-            // get Cookies
-            List<Cookie> cookies = cookieStore.getCookies();
-            String cookiesString = "";
-            for (Cookie myCookie : cookies)
-            {
-                cookiesString += myCookie.getName() + "=" + myCookie.getValue()
-                        + "; ";
-                org.apache.jmeter.protocol.http.control.Cookie myJmeterCookie = new org.apache.jmeter.protocol.http.control.Cookie(
-                        myCookie.getName(), myCookie.getValue(),
-                        myCookie.getDomain(), myCookie.getPath(), false,
-                        myCookie.getExpiryDate().getTime());
-                getCookieManager().add(myJmeterCookie);
-            }
-
-            httpSamplerResult.setCookies(cookiesString);
-            httpSamplerResult.setResponseHeaders(myHeaderRsponse);
-            httpSamplerResult.setContentType("application/json");
-
-            LOG.debug("End : sample");
-
-        } 
+        }
         catch (MalformedChallengeException e)
         {
-            LOG.error(e.getMessage(), e);
-        } 
+
+        }
         catch (AuthenticationException e)
         {
-            LOG.error(e.getMessage(), e);
-        } 
-        catch (HttpResponseException e)
-        {
-            LOG.warn(e.getMessage(), e);
-            HttpResponseException myException = (HttpResponseException) e;
-            String myCode = String.valueOf(myException.getStatusCode());
-            httpSamplerResult.setResponseCode(myCode);
-            httpSamplerResult.setSuccessful(isSuccessCode(myException
-                    .getStatusCode()));
-        } 
-        catch (ClientProtocolException e)
-        {
-            LOG.error(e.getMessage(), e);
-        } 
-        catch (IOException e)
-        {
 
-            LOG.error(e.getMessage(), e);
-        } 
-        finally
-        {
-            httpclient.getConnectionManager().shutdown();
-            httpclient2.getConnectionManager().shutdown();
         }
 
         return httpSamplerResult;
